@@ -323,46 +323,50 @@
     margin-top: -28px;
   }
 
+/* 1. تنسيق المخطوطة (تصغير ورفع) */
   .card-calligraphy {
-    width: 90%;
-    max-width: 350px;
+    width: 72% !important; 
+    max-width: 280px;             
     object-fit: contain;
     display: block;
-    mix-blend-mode: screen;
+    margin: -45px auto 0 !important; /* رفع المخطوطة للأعلى */
+    mix-blend-mode: screen !important;
     position: relative;
     z-index: 2;
-    margin: 0 auto 2px;
   }
+
+  /* 2. نص Eid Mubarak (ضبط اللون والمسافة للخط) */
   .card-eid-label {
     font-size: clamp(0.9rem, 3vw, 1.15rem);
     font-weight: 500;
-    color: var(--white-60);
+    color: rgba(255, 255, 255, 0.6) !important;
     text-align: center;
     letter-spacing: 1px;
+    margin: 5px 0 15px 0 !important; /* إضافة مسافة سفلية لإظهار الخط */
     position: relative;
-    z-index: 2;
-    margin: 0;
+    z-index: 3;
   }
 
+  /* 3. الخط الذهبي (التأكد من ظهوره تحت Eid Mubarak) */
   .card-rule {
     width: 48px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 22px auto;
+    background: linear-gradient(90deg, transparent, #C9A96E, transparent) !important;
+    margin: 0 auto 20px auto !important; /* توسيط الخط وضبط المسافة تحته */
     position: relative;
+    display: block !important;
     z-index: 2;
   }
 
+  /* 4. كلمة "من" لضمان التباعد */
   .card-to-label {
     font-size: .85rem;
     font-weight: 500;
-    letter-spacing: 1px;
-    color: var(--white-60);
-    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.6) !important;
+    margin-bottom: 10px !important;
+    text-align: center;
     position: relative;
     z-index: 2;
-    text-align: center;
-    width: 100%;
   }
 
   .card-name {
@@ -491,6 +495,35 @@
   .card.swiping {
     transition: transform .12s ease !important;
   }
+
+  * تنسيقات خاصة للجوال (الشاشات أصغر من 480 بكسل) */
+@media (max-width: 480px) {
+  .card {
+    padding: 35px 20px !important; /* تقليل الحشو الداخلي للبطاقة */
+  }
+
+  .card-calligraphy {
+    width: 60% !important; /* تصغير المخطوطة أكثر لتناسب شاشة الجوال */
+    margin-top: -35px !important;
+  }
+
+  .card-eid-label {
+    margin: 2px 0 10px 0 !important; /* تقليل المسافات حول النص */
+    font-size: 0.9rem !important;
+  }
+
+  .card-rule {
+    margin: 0 auto 10px auto !important; /* تقصير المسافة تحت الخط */
+  }
+
+  .card-name {
+    font-size: 1.4rem !important; /* تصغير حجم الاسم لمنع التداخل */
+  }
+
+  .card-footer {
+    bottom: 12px !important; /* رفع التذييل قليلاً لمنع التداخل مع الاسم */
+  }
+}
 
 </style>
 </head>
@@ -776,22 +809,23 @@
     y += LOGO_SZ + LOGO_MB;
 
 
-    // Calligraphy image (مخطوطة كل عام وأنتم بخير)
+// Calligraphy image (مخطوطة كل عام وأنتم بخير)
     const calliImgEl = document.getElementById('cardCalligraphy');
-    const CALLI_W = Math.round(W * 0.84);          // 84% of card width
-    const CALLI_H = Math.round(CALLI_W / 2.68);    // aspect ratio 804:300 ≈ 2.68
+    const CALLI_W = Math.round(W * 0.67);          // تم تصغير العرض (0.84 * 0.8 ≈ 0.67)
+    const CALLI_H = Math.round(CALLI_W / 2.68);    
     const prevComposite = ctx.globalCompositeOperation;
-    ctx.globalCompositeOperation = 'screen';        // makes black bg invisible
+    ctx.globalCompositeOperation = 'screen';        // لإخفاء الخلفية السوداء للمخطوطة
     if (calliImgEl && calliImgEl.complete && calliImgEl.naturalWidth > 0) {
-      ctx.drawImage(calliImgEl, W/2 - CALLI_W/2, y, CALLI_W, CALLI_H);
+      // طرحنا 50 من الإحداثي y لرفع المخطوطة للأعلى
+      ctx.drawImage(calliImgEl, W/2 - CALLI_W/2, y - 50, CALLI_W, CALLI_H);
     }
-    ctx.globalCompositeOperation = prevComposite;
+    ctx.globalCompositeOperation = prevComposite;   // إعادة وضع الرسم للطبيعي فوراً لإصلاح مشكلة لون النص
     y += CALLI_H + Math.round(4 * S);
 
     // "Eid Mubarak"
     ctx.direction = 'ltr';
     ctx.font = `500 ${EID_FS}px ${FONT}`;
-    ctx.fillStyle = WHITE60;
+    ctx.fillStyle = WHITE60;                        // التأكد من استخدام اللون الأبيض الشفاف الأصلي
     ctx.fillText('Eid Mubarak', W/2, y);
     ctx.direction = 'rtl';
     y += EID_FS + RULE_MY;
